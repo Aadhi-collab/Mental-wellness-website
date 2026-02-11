@@ -1,0 +1,14 @@
+node_modules/
+.git/
+.gitignore
+*.md
+TESTING.md
+ARCHITECTURE.md
+PROJECT_SUMMARY.md
+QUICKSTART.md
+SUBMISSION_CHECKLIST.md
+GGGG.txt
+README.md
+.env
+.env.local
+.DS_Store
