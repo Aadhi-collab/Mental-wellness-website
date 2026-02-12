@@ -1,0 +1,19 @@
+{
+  "name": "mental-wellness-tracker",
+  "version": "1.0.0",
+  "description": "Mental Health Check-In & Wellness Tracker with NeonDB",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build required - static site with serverless functions'",
+    "db:init": "node db-init.js",
+    "setup": "bash setup.sh",
+    "setup:windows": "setup.bat",
+    "functions:install": "cd netlify/functions && npm install && cd ../.."
+  },
+  "devDependencies": {
+    "netlify-cli": "^16.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
