@@ -256,6 +256,11 @@ const CheckInView = {
         });
         
         // Validation
+        if (sleep > 23) {
+            alert('You cannot sleep more than 24 hours !');
+            return;
+        }
+        
         if (!stress) {
             alert('Please select your stress level!');
             return;
