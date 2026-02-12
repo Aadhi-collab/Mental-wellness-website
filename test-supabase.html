@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px 0;
+            font-weight: bold;
+            color: #555;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+            border: none;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .loading {
+            color: #004085;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Supabase Integration Test</h1>
+        <p>This page tests your Supabase configuration and allows you to manually test database operations.</p>
+
+        <!-- Config Test -->
+        <div class="test-section">
+            <h2>1. Test Configuration</h2>
+            <p>Click to verify your Supabase credentials are loaded correctly.</p>
+            <button onclick="testConfig()">Test Configuration</button>
+            <div id="configResult"></div>
+        </div>
+
+        <!-- Registration Test -->
+        <div class="test-section">
+            <h2>2. Test Registration</h2>
+            <label for="testEmail">Email:</label>
+            <input type="email" id="testEmail" placeholder="test@example.com">
+            <label for="testPassword">Password:</label>
+            <input type="password" id="testPassword" placeholder="At least 6 characters">
+            <label for="testName">Name:</label>
+            <input type="text" id="testName" placeholder="Your Full Name">
+            <button onclick="testRegister()">Register Test User</button>
+            <div id="registerResult"></div>
+        </div>
+
+        <!-- Login Test -->
+        <div class="test-section">
+            <h2>3. Test Login</h2>
+            <label for="loginEmail">Email:</label>
+            <input type="email" id="loginEmail" placeholder="test@example.com">
+            <label for="loginPassword">Password:</label>
+            <input type="password" id="loginPassword" placeholder="Your password">
+            <button onclick="testLogin()">Test Login</button>
+            <div id="loginResult"></div>
+        </div>
+
+        <!-- Check-In Test -->
+        <div class="test-section">
+            <h2>4. Test Check-In (After Login)</h2>
+            <label for="moodValue">Mood (1-10):</label>
+            <input type="number" id="moodValue" min="1" max="10" value="7">
+            <label for="sleepValue">Sleep (hours):</label>
+            <input type="number" id="sleepValue" min="0" max="24" step="0.5" value="8">
+            <label for="stressValue">Stress Level:</label>
+            <select id="stressValue" style="padding: 10px; font-size: 14px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+                <option value="Low">Low</option>
+                <option value="Moderate" selected>Moderate</option>
+                <option value="High">High</option>
+                <option value="Very High">Very High</option>
+            </select>
+            <label for="journalValue">Journal Notes (optional):</label>
+            <textarea id="journalValue" placeholder="Write your thoughts..." style="padding: 10px; font-size: 14px; border: 1px solid #ddd; border-radius: 4px; width: 100%; min-height: 80px;"></textarea>
+            <button onclick="testCheckIn()">Save Check-In</button>
+            <div id="checkInResult"></div>
+        </div>
+
+        <!-- Get Check-Ins Test -->
+        <div class="test-section">
+            <h2>5. Get Check-In History</h2>
+            <p>Retrieve all your check-ins (requires login first).</p>
+            <button onclick="testGetCheckIns()">Get My Check-Ins</button>
+            <div id="getCheckInsResult"></div>
+        </div>
+
+        <!-- Debug Info -->
+        <div class="test-section" style="border-left-color: #999; background: #f0f0f0;">
+            <h2>Debug Information</h2>
+            <button onclick="showDebugInfo()">Show Debug Info</button>
+            <div id="debugInfo"></div>
+        </div>
+    </div>
+
+    <!-- Supabase Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-auth.js"></script>
+
+    <script>
+        // Helper functions for UI
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.innerHTML = message;
+        }
+
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.className = 'result loading';
+            element.innerHTML = '⏳ Loading...';
+        }
+
+        // Test 1: Configuration
+        async function testConfig() {
+            showLoading('configResult');
+            try {
+                if (typeof supabaseClient === 'undefined') {
+                    throw new Error('Supabase client not loaded');
+                }
+                
+                if (!SUPABASE_URL || SUPABASE_URL.includes('YOUR_')) {
+                    throw new Error('SUPABASE_URL not configured. Update supabase-config.js');
+                }
+                
+                if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('YOUR_')) {
+                    throw new Error('SUPABASE_ANON_KEY not configured. Update supabase-config.js');
+                }
+
+                const { data: { user }, error } = await supabaseClient.auth.getUser();
+                
+                showResult('configResult', `
+                    ✅ <strong>Configuration Valid!</strong><br>
+                    <strong>Project URL:</strong> ${SUPABASE_URL.substring(0, 50)}...<br>
+                    <strong>Client Status:</strong> Connected<br>
+                    <strong>Current Auth Status:</strong> ${user ? 'Logged in as ' + user.email : 'Not logged in'}
+                `, 'success');
+            } catch (error) {
+                showResult('configResult', `
+                    ❌ <strong>Configuration Error:</strong><br>
+                    ${error.message}<br><br>
+                    <strong>Steps to fix:</strong><br>
+                    1. Go to supabase-config.js<br>
+                    2. Replace YOUR_SUPABASE_URL with your actual project URL<br>
+                    3. Replace YOUR_SUPABASE_ANON_KEY with your actual anon key<br>
+                    4. Save and refresh this page
+                `, 'error');
+            }
+        }
+
+        // Test 2: Registration
+        async function testRegister() {
+            const email = document.getElementById('testEmail').value.trim();
+            const password = document.getElementById('testPassword').value;
+            const name = document.getElementById('testName').value.trim();
+
+            if (!email || !password || !name) {
+                showResult('registerResult', '❌ Please fill in all fields', 'error');
+                return;
+            }
+
+            showLoading('registerResult');
+            try {
+                const result = await SupabaseAuthManager.registerUser(name, email, password);
+                
+                if (result.success) {
+                    showResult('registerResult', `
+                        ✅ <strong>Registration Successful!</strong><br>
+                        Email: ${email}<br>
+                        Name: ${name}<br><br>
+                        <strong>Next Steps:</strong><br>
+                        1. Check your email for confirmation link<br>
+                        2. Click the link to verify your email<br>
+                        3. Return here and test login
+                    `, 'success');
+                } else {
+                    showResult('registerResult', `
+                        ❌ <strong>Registration Failed:</strong><br>
+                        ${result.message}
+                    `, 'error');
+                }
+            } catch (error) {
+                showResult('registerResult', `
+                    ❌ <strong>Registration Error:</strong><br>
+                    ${error.message}
+                `, 'error');
+            }
+        }
+
+        // Test 3: Login
+        async function testLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showResult('loginResult', '❌ Please enter email and password', 'error');
+                return;
+            }
+
+            showLoading('loginResult');
+            try {
+                const result = await SupabaseAuthManager.loginUser(email, password);
+                
+                if (result.success) {
+                    showResult('loginResult', `
+                        ✅ <strong>Login Successful!</strong><br>
+                        User: ${result.user.name}<br>
+                        Email: ${result.user.email}<br>
+                        ID: ${result.user.id}<br><br>
+                        You can now test check-in functionality!
+                    `, 'success');
+                } else {
+                    showResult('loginResult', `
+                        ❌ <strong>Login Failed:</strong><br>
+                        ${result.message}
+                    `, 'error');
+                }
+            } catch (error) {
+                showResult('loginResult', `
+                    ❌ <strong>Login Error:</strong><br>
+                    ${error.message}
+                `, 'error');
+            }
+        }
+
+        // Test 4: Check-In
+        async function testCheckIn() {
+            showLoading('checkInResult');
+            try {
+                const userId = await SupabaseAuthManager.getUserId();
+                if (!userId) {
+                    throw new Error('You must be logged in first');
+                }
+
+                const mood = parseInt(document.getElementById('moodValue').value);
+                const sleep = parseFloat(document.getElementById('sleepValue').value);
+                const stress = document.getElementById('stressValue').value;
+                const journal = document.getElementById('journalValue').value.trim();
+
+                const result = await saveCheckIn(userId, {
+                    mood,
+                    stressLevel: stress,
+                    sleepHours: sleep,
+                    journalNotes: journal
+                });
+
+                if (result.success) {
+                    showResult('checkInResult', `
+                        ✅ <strong>Check-In Saved Successfully!</strong><br>
+                        Mood: ${mood}/10<br>
+                        Sleep: ${sleep} hours<br>
+                        Stress: ${stress}<br>
+                        Saved at: ${new Date().toLocaleString()}<br><br>
+                        Check your Supabase dashboard table "wellness_checkins" to verify!
+                    `, 'success');
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                showResult('checkInResult', `
+                    ❌ <strong>Check-In Error:</strong><br>
+                    ${error.message}
+                `, 'error');
+            }
+        }
+
+        // Test 5: Get Check-Ins
+        async function testGetCheckIns() {
+            showLoading('getCheckInsResult');
+            try {
+                const userId = await SupabaseAuthManager.getUserId();
+                if (!userId) {
+                    throw new Error('You must be logged in first');
+                }
+
+                const checkIns = await getUserCheckIns(userId);
+                
+                if (checkIns.length === 0) {
+                    showResult('getCheckInsResult', `
+                        ℹ️ <strong>No check-ins found yet</strong><br>
+                        Try saving a check-in first (Test 4)
+                    `, 'info');
+                } else {
+                    let html = `✅ <strong>Found ${checkIns.length} Check-Ins:</strong><br><br>`;
+                    checkIns.forEach((checkin, index) => {
+                        html += `<strong>Check-in ${index + 1}:</strong><br>`;
+                        html += `• Date: ${new Date(checkin.created_at).toLocaleString()}<br>`;
+                        html += `• Mood: ${checkin.mood}/10<br>`;
+                        html += `• Sleep: ${checkin.sleep_hours} hours<br>`;
+                        html += `• Stress: ${checkin.stress_level}<br>`;
+                        if (checkin.journal_notes) {
+                            html += `• Notes: ${checkin.journal_notes.substring(0, 50)}...<br>`;
+                        }
+                        html += `<br>`;
+                    });
+                    showResult('getCheckInsResult', html, 'success');
+                }
+            } catch (error) {
+                showResult('getCheckInsResult', `
+                    ❌ <strong>Error Getting Check-Ins:</strong><br>
+                    ${error.message}
+                `, 'error');
+            }
+        }
+
+        // Debug Info
+        function showDebugInfo() {
+            const debugDiv = document.getElementById('debugInfo');
+            const info = {
+                'Supabase URL': SUPABASE_URL ? SUPABASE_URL.substring(0, 50) + '...' : 'NOT SET',
+                'Supabase Key': SUPABASE_ANON_KEY ? SUPABASE_ANON_KEY.substring(0, 20) + '...' : 'NOT SET',
+                'Client Available': typeof supabaseClient !== 'undefined' ? 'Yes' : 'No',
+                'AuthManager Available': typeof SupabaseAuthManager !== 'undefined' ? 'Yes' : 'No',
+                'StorageManager Available': typeof SupabaseStorageManager !== 'undefined' ? 'Yes' : 'No',
+                'User Agent': navigator.userAgent,
+                'Timestamp': new Date().toISOString()
+            };
+
+            let html = '<pre>';
+            for (const [key, value] of Object.entries(info)) {
+                html += `<strong>${key}:</strong> ${value}\n`;
+            }
+            html += '</pre>';
+            debugDiv.innerHTML = html;
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            console.log('✅ Test page loaded. Supabase ready to test!');
+        });
+    </script>
+</body>
+</html>

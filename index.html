@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Check-In & Wellness Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Page -->
+        <div id="loginPage" class="login-page">
+            <div class="login-container">
+                <div class="login-box">
+                    <h1>🌟 Wellness Tracker</h1>
+                    <p class="login-subtitle">Your personal mental health companion</p>
+                    
+                    <!-- Login Form -->
+                    <div id="loginForm" class="login-form active-form">
+                        <h2>Sign In</h2>
+                        <div class="form-group">
+                            <label for="loginEmail">Email:</label>
+                            <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password:</label>
+                            <div class="password-input-group">
+                                <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                                <button type="button" class="password-toggle" id="loginPasswordToggle" aria-label="Toggle password visibility">👁️</button>
+                            </div>
+                        </div>
+                        <button class="btn-primary" id="loginSubmitBtn">Sign In</button>
+                        <p class="form-toggle">
+                            Don't have an account? <a href="#" id="showRegisterBtn">Create one</a>
+                        </p>
+                    </div>
+                    
+                    <!-- Register Form -->
+                    <div id="registerForm" class="login-form">
+                        <h2>Create Account</h2>
+                        <div class="form-group">
+                            <label for="registerName">Full Name:</label>
+                            <input type="text" id="registerName" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerEmail">Email:</label>
+                            <input type="email" id="registerEmail" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPassword">Password:</label>
+                            <div class="password-input-group">
+                                <input type="password" id="registerPassword" placeholder="Enter a password (min 6 chars)" required>
+                                <button type="button" class="password-toggle" id="registerPasswordToggle" aria-label="Toggle password visibility">👁️</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPasswordConfirm">Confirm Password:</label>
+                            <div class="password-input-group">
+                                <input type="password" id="registerPasswordConfirm" placeholder="Confirm your password" required>
+                                <button type="button" class="password-toggle" id="registerPasswordConfirmToggle" aria-label="Toggle password visibility">👁️</button>
+                            </div>
+                        </div>
+                        <button class="btn-primary" id="registerSubmitBtn">Create Account</button>
+                        <p class="form-toggle">
+                            Already have an account? <a href="#" id="showLoginBtn">Sign in</a>
+                        </p>
+                    </div>
+                    
+                    <div class="login-footer">
+                        <p>Your data is stored securely on your device. No servers, no tracking.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App (Hidden until logged in) -->
+        <div id="mainApp" class="main-app hidden">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-content">
+                <h1 class="logo">🌟 Wellness Tracker</h1>
+                <div class="nav-buttons">
+                    <button class="nav-btn active" data-view="check-in">Daily Check-in</button>
+                    <button class="nav-btn" data-view="history">History</button>
+                    <button class="nav-btn" data-view="analytics">Analytics</button>
+                    <button class="nav-btn" data-view="resources">Resources</button>
+                </div>
+                <div class="nav-buttons">
+                    <span id="userGreeting" class="user-greeting"></span>
+                    <button class="theme-toggle" id="themeToggle">🌙</button>
+                    <button class="nav-btn" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Check-in View -->
+            <section id="check-in" class="view active">
+                <div class="check-in-container">
+                    <h2>Today's Check-in</h2>
+                    <p class="date-display" id="dateDisplay"></p>
+
+                    <!-- Mood Selection -->
+                    <div class="section">
+                        <h3>How are you feeling today?</h3>
+                        <div class="mood-selector">
+                            <div class="mood-emoji" data-mood="1">😢</div>
+                            <div class="mood-emoji" data-mood="2">😟</div>
+                            <div class="mood-emoji" data-mood="3">😐</div>
+                            <div class="mood-emoji" data-mood="4">🙂</div>
+                            <div class="mood-emoji" data-mood="5">😊</div>
+                        </div>
+                        <div class="mood-slider-container">
+                            <label for="moodSlider">Mood Scale (1-10):</label>
+                            <input type="range" id="moodSlider" min="1" max="10" value="5">
+                            <span id="moodValue">5</span>
+                        </div>
+                    </div>
+
+                    <!-- Sleep Tracking -->
+                    <div class="section">
+                        <h3>😴 Sleep Last Night</h3>
+                        <div class="input-group">
+                            <label for="sleepHours">Hours slept:</label>
+                            <input type="number" id="sleepHours" min="0" max="23" step="0.5" placeholder="e.g., 7.5">
+                        </div>
+                    </div>
+
+                    <!-- Stress Level -->
+                    <div class="section">
+                        <h3>📈 Stress Level</h3>
+                        <div class="stress-buttons">
+                            <button class="stress-btn" data-stress="1">Low 😌</button>
+                            <button class="stress-btn" data-stress="2">Moderate 😐</button>
+                            <button class="stress-btn" data-stress="3">High 😰</button>
+                            <button class="stress-btn" data-stress="4">Very High 😱</button>
+                        </div>
+                    </div>
+
+                    <!-- Journal Entry -->
+                    <div class="section">
+                        <h3>💭 Journal Entry (Optional)</h3>
+                        <textarea id="journalEntry" placeholder="How was your day? What's on your mind?"></textarea>
+                    </div>
+
+                    <!-- Activities/Tags -->
+                    <div class="section">
+                        <h3>🎯 Activities Today</h3>
+                        <div class="activity-tags">
+                            <label class="tag-checkbox">
+                                <input type="checkbox" value="exercise"> 💪 Exercise
+                            </label>
+                            <label class="tag-checkbox">
+                                <input type="checkbox" value="meditation"> 🧘 Meditation
+                            </label>
+                            <label class="tag-checkbox">
+                                <input type="checkbox" value="socializing"> 👥 Socializing
+                            </label>
+                            <label class="tag-checkbox">
+                                <input type="checkbox" value="study"> 📚 Study
+                            </label>
+                            <label class="tag-checkbox">
+                                <input type="checkbox" value="hobby"> 🎨 Hobby
+                            </label>
+                            <label class="tag-checkbox">
+                                <input type="checkbox" value="rest"> 🛌 Rest
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button class="btn-primary" id="submitBtn">Save Check-in</button>
+
+                    <!-- Streak Display -->
+                    <div class="streak-container">
+                        <div class="streak-card">
+                            <span class="streak-flame">🔥</span>
+                            <div class="streak-info">
+                                <p class="streak-label">Current Streak</p>
+                                <p class="streak-count" id="streakCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wellness Suggestion -->
+                    <div id="wellnessSuggestion" class="wellness-suggestion" style="display: none;">
+                        <h4>💡 Wellness Suggestion</h4>
+                        <p id="suggestionText"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History View -->
+            <section id="history" class="view">
+                <div class="history-container">
+                    <h2>Mood History</h2>
+                    <div class="history-content">
+                        <!-- Calendar View -->
+                        <div class="calendar-section">
+                            <div class="calendar-header">
+                                <button id="prevMonth" class="calendar-nav">←</button>
+                                <h3 id="monthYearDisplay"></h3>
+                                <button id="nextMonth" class="calendar-nav">→</button>
+                            </div>
+                            <div class="calendar-weekdays">
+                                <div class="weekday">Sun</div>
+                                <div class="weekday">Mon</div>
+                                <div class="weekday">Tue</div>
+                                <div class="weekday">Wed</div>
+                                <div class="weekday">Thu</div>
+                                <div class="weekday">Fri</div>
+                                <div class="weekday">Sat</div>
+                            </div>
+                            <div id="calendarDays" class="calendar-days"></div>
+                        </div>
+
+                        <!-- Details Panel -->
+                        <div class="details-section">
+                            <div id="detailsPanel" class="details-panel">
+                                <p style="text-align: center; color: var(--text-secondary);">Click on a date to see details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics View -->
+            <section id="analytics" class="view">
+                <div class="analytics-container">
+                    <h2>Analytics & Visualizations</h2>
+                    
+                    <!-- Summary Cards -->
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <h4>Average Mood</h4>
+                            <p class="summary-value" id="avgMood">-</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Average Sleep</h4>
+                            <p class="summary-value" id="avgSleep">-</p>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Average Stress</h4>
+                            <p class="summary-value" id="avgStress">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <canvas id="moodChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="sleepChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="stressChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Summary -->
+                    <div class="weekly-summary">
+                        <h3>📊 Weekly Summary</h3>
+                        <div id="weeklySummaryContent"></div>
+                    </div>
+
+                    <!-- Export Options -->
+                    <div class="export-options">
+                        <button class="btn-secondary" id="exportCSV">📥 Export as CSV</button>
+                        <button class="btn-secondary" id="exportPDF">📄 Export as PDF</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Resources View -->
+            <section id="resources" class="view">
+                <div class="resources-container">
+                    <h2>🆘 Emergency Resources & Support</h2>
+                    
+                    <div class="crisis-alert">
+                        <h3>⚠️ In Crisis?</h3>
+                        <p>If you're experiencing a mental health emergency, please reach out for help immediately.</p>
+                    </div>
+
+                    <div class="resources-grid">
+                        <!-- Crisis Hotlines -->
+                        <div class="resource-card">
+                            <h3>🆘 Crisis Hotlines</h3>
+                            <ul>
+                                <li><strong>National Suicide Prevention Lifeline:</strong> 988 (Call/Text)</li>
+                                <li><strong>Crisis Text Line:</strong> Text HOME to 741741</li>
+                                <li><strong>International Association for Suicide Prevention:</strong> https://www.iasp.info/resources/Crisis_Centres/</li>
+                            </ul>
+                        </div>
+
+                        <!-- Campus Resources -->
+                        <div class="resource-card">
+                            <h3>🏫 Campus Resources</h3>
+                            <ul>
+                                <li><strong>Counseling Services:</strong> Check your school's website</li>
+                                <li><strong>Health Center:</strong> Available for medical and mental health support</li>
+                                <li><strong>Student Wellness Programs:</strong> Yoga, meditation, fitness classes</li>
+                                <li><strong>Peer Support Groups:</strong> Connect with fellow students</li>
+                            </ul>
+                        </div>
+
+                        <!-- Self-Care Tips -->
+                        <div class="resource-card">
+                            <h3>💚 Self-Care Tips</h3>
+                            <ul>
+                                <li>🚶 Take regular breaks and go for walks</li>
+                                <li>🧘 Practice meditation or deep breathing</li>
+                                <li>💤 Maintain a consistent sleep schedule</li>
+                                <li>🥗 Eat nutritious meals regularly</li>
+                                <li>👥 Reach out to friends and family</li>
+                                <li>📚 Manage stress through time management</li>
+                            </ul>
+                        </div>
+
+                        <!-- Mental Health Info -->
+                        <div class="resource-card">
+                            <h3>📖 Mental Health Resources</h3>
+                            <ul>
+                                <li><strong>Mental Health America:</strong> https://www.mhanational.org/</li>
+                                <li><strong>NAMI (National Alliance on Mental Illness):</strong> https://www.nami.org/</li>
+                                <li><strong>SAMHSA National Helpline:</strong> 1-800-662-4357</li>
+                                <li><strong>Psychology Today Therapist Finder:</strong> https://www.psychologytoday.com/</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="resources-footer">
+                        <p>Remember: Seeking help is a sign of strength, not weakness. You are not alone. 💚</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
